@@ -57,27 +57,29 @@ def main():
     spans_t = [500, 1000, 2000, 4000] # spans across timestamps t
     spans_xy = [4, 8, 16, 32, 64] # spans across dim x,y
     max_samples = 100
+    path_results ='time_read' # stores results from reads
+    inp_nwb = 'oophys_Config{config}.nwb'.format(config = str(configParam)) # nwb file name
+    out_h5 = 'readtests_oophys_config{config}.h5'.format(config = str(configParam)) # output hdf5 file
+
     random.seed(30)
 
-    with pynwb.NWBHDF5IO(filepath, "r", load_namespaces=True) as io:
+    with pynwb.NWBHDF5IO(filepath+inp_nwb, "r", load_namespaces=True) as io:
         nwbfile = io.read()
 
-        with h5py.File(outfile + str(configParam)+'.h5', 'a') as f:
+        with h5py.File(outfile + out_h5, 'a') as f:
             for uc in range(4,7): # 3 use cases tested
                 path ='/usecase{usecase}/'.format(usecase = str(uc)) # path to use case
                 for span_len_t in spans_t:
-                  path_span_t = path + 't{span_t}/'.format(span_t= str(span_len_t)) # path to spans t (across timestamps), for every use case
+                  path_span_t = path + 't{span_t}/'.format(span_t = str(span_len_t)) # path to spans t (across timestamps), for every use case
                   if uc == 4:
                     for span_len_xy in spans_xy:
                       path_span_txy = path_span_t + 'xy{}/'.format(str(span_len_xy)) # path to spans across dim x,y for every span t, in each use case
-                      path_results ='results' # stores results from reads
                       path_samples ='samples_t0x0y0' # stores sampled starting points across t, x, y
                       dim1 = max_samples
                       dim2 = 3
                       create_dataset(f, path_results, path_samples, path_span_txy, dim1, dim2, n_timestamps, span_len_t, dim_x, span_len_xy, dim_y, uc, nwbfile)
                   else:
                        path_span_txy = path
-                       path_results = 'results'
                        path_samples = 'samples_t0' # stores sampled starting points across t
                        dim1 = max_samples
                        dim2 = 1
