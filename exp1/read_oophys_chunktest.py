@@ -7,7 +7,7 @@ import sys
 import random
 import h5py
 from time import perf_counter
-
+import hdf5plugin
 def time_ms(t0,t1,x0,x1,y0,y1,nwbfile):
     start_eval = time.perf_counter_ns()
     nwbfile.acquisition["TwoPhotonSeries"].data[t0:t1, x0:x1, y0:y1]
